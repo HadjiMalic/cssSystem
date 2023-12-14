@@ -247,24 +247,38 @@ if ($result->num_rows > 0) {
     <script>
         // Your existing functions here (e.g., archiveResponses)
         function archiveResponse(responseId) {
-            // Display a confirmation dialog
-            var confirmArchive = window.confirm("Are you sure you want to archive this response?");
+    // Display a confirmation dialog
+    var confirmArchive = window.confirm("Are you sure you want to archive this response?");
 
-            // If the user clicks OK in the confirmation dialog, proceed with archiving
-            if (confirmArchive) {
-                // Send an AJAX request to the PHP script to handle the archiving
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        // Handle the response from the server, if needed
-                        alert(this.responseText);
-                        // You can reload the page or update the UI as needed
+    // If the user clicks OK in the confirmation dialog, proceed with archiving
+    if (confirmArchive) {
+        // Send an AJAX request to the PHP script to handle the archiving
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    // Handle the response from the server
+                    if (this.responseText.includes("Response archived successfully")) {
+                        // If the archive was successful, remove the row from the UI
+                        var row = document.querySelector('tr[data-id="' + responseId + '"]');
+                        if (row) {
+                            row.remove();
+                        }
+                        alert(this.responseText); // Display success message after row removal
+                    } else {
+                        alert("Error archiving response: " + this.responseText);
                     }
-                };
-                xhttp.open("GET", "archive_response.php?responseId=" + responseId, true);
-                xhttp.send();
+                } else {
+                    // Handle the case where the request failed
+                    alert("Error archiving response.");
+                }
             }
-        }
+        };
+        xhttp.open("GET", "archive_response.php?responseId=" + responseId, true);
+        xhttp.send();
+    }
+}
+
         function logout() {
     // Display a confirmation dialog
     var confirmLogout = window.confirm("Are you sure you want to log out?");

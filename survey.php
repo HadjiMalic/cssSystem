@@ -679,19 +679,14 @@
                 </td>
             </tr>
             </tr>
-            <!-- Add more questions here as needed -->
+            
         </table>
         <div class="feedback-box">
             <label for="feedback">Do you have any additional comments or feedback?</label>
             <textarea id="feedback" name="feedback" rows="4" placeholder="Type your feedback here..." ></textarea>
         </div>
-
-
-     
-
-            <button class="submitButton" type="submit">Submit</button>
+        <button class="submitButton" type="submit">Submit</button>
         </form>
-
         <button class="back-button" onclick="goBack()">Back</button>
 
         <script>
@@ -712,6 +707,7 @@
     // Open the modal when the page loads
     window.onload = function () {
         modal.style.display = 'block';
+        
     };
 
     function validateForm() {

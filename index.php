@@ -113,8 +113,8 @@ System integration in client satisfaction surveys streamlines processes, boosts 
 								</section>
 								<section>
 									<span class="icon major fa-gem"></span>
-									<h3>Exclusive for school purposes only.</h3>
-									<p>The developed system only exclusive for the people in the University of Science and Technology of the Southern Phillippines.</p>
+									<h3>Exclusive for school purposes only</h3>
+									<p>The developed system only exclusive for the people in the University of Science and Technology of the Southern Phillippines in partial fulfillment for the subject Software Engineering.</p>
 								</section>
 							</div>
 							<ul class="actions">

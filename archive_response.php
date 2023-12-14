@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
         // Delete the response from the survey_responses table
         $deleteSql = "DELETE FROM survey_responses WHERE id = $responseId";
         if ($conn->query($deleteSql) === TRUE) {
-            echo "Response archived successfully.";
+            echo "Response archived successfully";
         } else {
             echo "Error deleting response: " . $conn->error;
         }
@@ -42,6 +42,6 @@ if ($result->num_rows > 0) {
 } else {
     echo "Response not found.";
 }
-$conn->close();
 
+$conn->close();
 ?>
