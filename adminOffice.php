@@ -1,101 +1,73 @@
+<?php
+session_start();
+
+// Function to get the current month
+function getCurrentMonth()
+{
+    return date('m');
+}
+
+// Database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "css_system";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch survey responses from the database
+$currentMonth = getCurrentMonth();
+$sql = "SELECT * FROM survey_responses";
+$result = $conn->query($sql);
+
+// Check if the current month is different from the stored month
+if (!isset($_SESSION['currentMonth']) || $_SESSION['currentMonth'] != $currentMonth) {
+    // Reset user IDs and update the stored month
+    $_SESSION['currentMonth'] = $currentMonth;
+    $resetIdsSql = "ALTER TABLE survey_responses AUTO_INCREMENT = 1";
+    $conn->query($resetIdsSql);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+          integrity="sha512-pzjw8/0ZYs0n8RW36ByRlA5RMyW5tZj3GlRIqPBHvQ5e85ZvA1BEJRKM5QmLkG9UYbSz8pT2cjs3tt4/GbD6KNsMw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
     <title>Home</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-image: url('images/ustp.jpg');
+            background-image: url('images/ustpalter.png');
             background-repeat: no-repeat;
             background-size: cover;
             color: #333;
         }
 
-        .sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 50px;
-            background-image: url('pics/logo.png');
-            background-position: left top;
-            background-repeat: no-repeat;
-            background-size: 50%;
-            border-right: 1px solid #ddd;
-            background-color: rgba(0, 1, 55, 0.9);
-            font-weight: bolder;
-            transition: width 0.3s;
-        }
-
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar.active {
-            width: 40px;
-        }
-
-        .sidebar a:hover {
-            font-size: 20px;
-            color: #ffc000;
-        }
-
-        .sidebar a.active {
-            color: whitesmoke;
-            font-size: 20px;
-            border-radius: 10px;
-        }
-
-        .sidebar a.active:hover {
-            color: white;
-        }
-
         .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    margin-left: 250px; /* Adjust the margin to match the width of your sidebar */
-}
-        .navbar {
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-        }
-
-        .navbar select,
-        .navbar button {
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .box {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-style: ridge;
             padding: 20px;
-            border-radius: 10px;
-            margin: 10px;
+            margin-left: 250px;
         }
 
-        .box h1, .box h2 {
-            text-align: center;
-        }
-
-        .logout-button {
+        .arrow-link {
             position: fixed;
             bottom: 10px;
             left: 10px;
@@ -107,188 +79,230 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
-        .logout-button:hover {
-            background-color: #cc0000;
-        }
-
-        #pieChart {
-            max-width: 100%;
-            height: auto;
-            margin: 10px;
-        }
-
-        table {
-    margin-top: 10px; /* Adjusted margin */
-    border-collapse: collapse;
-    width: 100%;
-    background-color: #fff;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Added margin-bottom for spacing */
-}
-
-th, td {
-    padding: 10px; /* Reduced padding */
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    background-color: #007bff;
-    color: white;
-}
-
-tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-}
-
-.archive-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .archive-button:hover {
-            background-color: #218838;
-        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <a href="adminOffice.php">Manage Responses</a>
-        <a href="feedbacks.php">Collect Feedbacks and Comments</a>
-        <a href="surveyQuestionnaire.php">Manage Questionnaires</a>
-        <a href="archives.php">Archives</a>
+<div class="content relative">
+
+    <!-- Arrow Icon to redirect to adminDashboard.php -->
+    <a href="adminDashboard.php" class="arrow-link">
+        &#9664; Back
+    </a>
+
+    <div class="mt-4 flex items-center space-x-2">
+        <label class="mr-2"></label>
+        <select id="sortOfficeType" class="px-2 py-1 rounded border">
+            <option value="">By Office</option>
+            <?php
+            $sqlOfficeTypes = "SELECT DISTINCT office_type FROM survey_responses";
+            $resultOfficeTypes = $conn->query($sqlOfficeTypes);
+            $officeTypes = $resultOfficeTypes->fetch_all(MYSQLI_ASSOC);
+            foreach ($officeTypes as $office) {
+                echo '<option value="' . $office['office_type'] . '">' . $office['office_type'] . '</option>';
+            }
+            ?>
+        </select>
+        <select id="sortMonth" class="px-2 py-1 rounded border">
+            <option value="">By Month</option>
+            <?php
+            for ($month = 1; $month <= 12; $month++) {
+                $monthName = date('F', mktime(0, 0, 0, $month, 1));
+                echo '<option value="' . $month . '">' . $monthName . '</option>';
+            }
+            ?>
+        </select>
+        <select id="sortYear" class="px-2 py-1 rounded border">
+            <option value="">By Year</option>
+            <?php
+            $currentYear = date('Y');
+            for ($year = $currentYear; $year >= $currentYear - 1; $year--) {
+                echo '<option value="' . $year . '">' . $year . '</option>';
+            }
+            ?>
+        </select>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded border hover:bg-blue-700" onclick="applySort()">Search</button>
+        <button class="px-4 py-2 bg-green-500 text-white rounded border hover:bg-green-700 ml-2" onclick="printTable()">Print</button>
     </div>
 
-    <div class="content">
-        <h2>Survey Responses</h2>
+    <?php
+    // Pagination settings
+    $resultsPerPage = 7; // Number of results per page
 
-        <?php
-        // Database connection details
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "css_system";
+    // Fetch data with pagination based on sorting criteria
+    $sortOfficeType = isset($_GET['sortOfficeType']) ? $_GET['sortOfficeType'] : '';
+    $sortMonth = isset($_GET['sortMonth']) ? $_GET['sortMonth'] : '';
+    $sortYear = isset($_GET['sortYear']) ? $_GET['sortYear'] : '';
 
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
+    $sqlCount = "SELECT COUNT(*) as count FROM survey_responses WHERE 
+                 (office_type = '$sortOfficeType' OR '$sortOfficeType' = '') AND 
+                 (MONTH(created_at) = '$sortMonth' OR '$sortMonth' = '') AND 
+                 (YEAR(created_at) = '$sortYear' OR '$sortYear' = '')";
+    $resultCount = $conn->query($sqlCount);
+    $totalResults = $resultCount->fetch_assoc()['count'];
+    $totalPages = ceil($totalResults / $resultsPerPage);
 
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+    // Get current page or set a default
+    $currentPage = (isset($_GET['page']) && is_numeric($_GET['page'])) ? $_GET['page'] : 1;
+    $currentPage = max(min($currentPage, $totalPages), 1);
+
+    // Calculate the offset for the query
+    $offset = ($currentPage - 1) * $resultsPerPage;
+
+    $sqlPagination = "SELECT * FROM survey_responses WHERE 
+                     (office_type = '$sortOfficeType' OR '$sortOfficeType' = '') AND 
+                     (MONTH(created_at) = '$sortMonth' OR '$sortMonth' = '') AND 
+                     (YEAR(created_at) = '$sortYear' OR '$sortYear' = '') 
+                     LIMIT $resultsPerPage OFFSET $offset";
+    $resultPagination = $conn->query($sqlPagination);
+
+    // Display the selected sorting criteria
+    echo '<div class="mt-2">';
+    if (!empty($sortOfficeType)) {
+        echo '<span class="mr-2 bg-yellow-500 text-white px-2 py-1 rounded">Office Type: ' . $sortOfficeType . '</span>';
+    }
+    if (!empty($sortMonth)) {
+        echo '<span class="mr-2 bg-yellow-500 text-white px-2 py-1 rounded">Month: ' . date('F', mktime(0, 0, 0, $sortMonth, 1)) . '</span>';
+    }
+    if (!empty($sortYear)) {
+        echo '<span class="mr-2 bg-yellow-500 text-white px-2 py-1 rounded">Year: ' . $sortYear . '</span>';
+    }
+    echo '</div>';
+
+    // Display the table if there are rows in the result
+    if ($resultPagination && $resultPagination->num_rows > 0) {
+        echo '<table class="min-w-full bg-white border border-gray-300 shadow-md rounded-md divide-y divide-gray-300">';
+        echo '<thead>';
+        echo '<tr>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">ID</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 1</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 2</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 3</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 4</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 5</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 6</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 7</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 8</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 9</th>';
+        // Add more cells for other questions as needed
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Date Submitted</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Office Type</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Action</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
+
+        // Output data of each row
+        while ($row = $resultPagination->fetch_assoc()) {
+            echo '<tr>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["id"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question1"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question2"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question3"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question4"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question5"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question6"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question7"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question8"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question9"] . '</td>';
+            // Add more cells for other questions as needed
+            echo '<td class="py-2 px-2 border ml-2">' . $row["created_at"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["office_type"] . '</td>';
+            echo '<td class="py-2 px-2 border text-center ml-2">';
+            echo '<button class="archive-button bg-blue-500 text-white hover:bg-red-700 px-2 py-1 rounded transition duration-300" onclick="archiveResponse(' . $row["id"] . ')">';
+            echo '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">';
+            echo '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8l-8 8-4-4-4 4"></path>';
+            echo '</svg>';
+            echo '</button>';
+            echo '</td>';
+            echo '</tr>';
         }
 
-        // Fetch survey responses from the database
-        $sql = "SELECT * FROM survey_responses";
-        $result = $conn->query($sql);
+        echo '</tbody>';
+        echo '</table>';
 
-        // Display the table if there are rows in the result
-        // Display the table if there are rows in the result
-if ($result->num_rows > 0) {
-    echo '<table>';
-    echo '<thead>';
-    echo '<tr>';
-    echo '<th>ID</th>';
-    echo '<th>Question 1</th>';
-    echo '<th>Question 2</th>';
-    echo '<th>Question 3</th>'; // Add this line for question3
-    echo '<th>Question 4</th>'; // Add this line for question4
-    echo '<th>Question 5</th>'; // Add this line for question5
-    echo '<th>Question 6</th>'; // Add this line for question6
-    echo '<th>Question 7</th>'; // Add this line for question7
-    echo '<th>Question 8</th>'; // Add this line for question8
-    echo '<th>Question 9</th>'; // Add this line for question9
-    echo '<th>Feedback</th>';
-    echo '<th>Created At</th>';
-    echo '<th>Office Type</th>';
-    echo '<th>Action</th>';
-    echo '</tr>';
-    echo '</thead>';
-    echo '<tbody>';
+        // Pagination links
+        echo '<div class="mt-4">';
+        if ($totalPages > 1) {
+            echo '<span class="mr-2 bg-blue-500 text-white px-2 py-1 rounded">Page ' . $currentPage . ' of ' . $totalPages . '</span>';
 
-    // Output data of each row
-    while ($row = $result->fetch_assoc()) {
-        echo '<tr>';
-        echo '<td>' . $row["id"] . '</td>';
-        echo '<td>' . $row["question1"] . '</td>';
-        echo '<td>' . $row["question2"] . '</td>';
-        echo '<td>' . $row["question3"] . '</td>';
-        echo '<td>' . $row["question4"] . '</td>';
-        echo '<td>' . $row["question5"] . '</td>';
-        echo '<td>' . $row["question6"] . '</td>';
-        echo '<td>' . $row["question7"] . '</td>';
-        echo '<td>' . $row["question8"] . '</td>';
-        echo '<td>' . $row["question9"] . '</td>';
-        // Add more cells for other questions as needed
-        echo '<td>' . $row["feedback"] . '</td>';
-        echo '<td>' . $row["created_at"] . '</td>';
-        echo '<td>' . $row["office_type"] . '</td>';
-        echo '<td><button class="archive-button" onclick="archiveResponse(' . $row["id"] . ')">Archive</button></td>';
-        echo '</tr>';
+            for ($i = 1; $i <= $totalPages; $i++) {
+                echo '<a href="?page=' . $i . '&sortOfficeType=' . $sortOfficeType . '&sortMonth=' . $sortMonth . '&sortYear=' . $sortYear . '" class="pagination-link px-2 py-1 rounded hover:bg-gray-300 text-white bg-blue-500">' . $i . '</a>';
+            }
+        }
+        echo '</div>';
+        
+    } else {
+        echo 'No survey responses found.';
     }
+    ?>
 
-    echo '</tbody>';
-    echo '</table>';
-} else {
-    echo 'No survey responses found.';
-}
-
-
-        $conn->close();
-        ?>
-
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </div>
 
     <script>
-        // Your existing functions here (e.g., archiveResponses)
+         function applySort() {
+            var sortOfficeType = document.getElementById('sortOfficeType').value;
+            var sortMonth = document.getElementById('sortMonth').value;
+            var sortYear = document.getElementById('sortYear').value;
+
+            // Redirect to the same page with sorting parameters
+            window.location.href = '?page=1&sortOfficeType=' + sortOfficeType + '&sortMonth=' + sortMonth + '&sortYear=' + sortYear;
+        }
+    // Your existing functions here (e.g., archiveResponses)
         function archiveResponse(responseId) {
-    // Display a confirmation dialog
-    var confirmArchive = window.confirm("Are you sure you want to archive this response?");
+            // Display a confirmation dialog
+            var confirmArchive = window.confirm("Are you sure you want to archive this response?");
 
-    // If the user clicks OK in the confirmation dialog, proceed with archiving
-    if (confirmArchive) {
-        // Send an AJAX request to the PHP script to handle the archiving
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 200) {
-                    // Handle the response from the server
-                    if (this.responseText.includes("Response archived successfully")) {
-                        // If the archive was successful, remove the row from the UI
-                        var row = document.querySelector('tr[data-id="' + responseId + '"]');
-                        if (row) {
-                            row.remove();
+            // If the user clicks OK in the confirmation dialog, proceed with archiving
+            if (confirmArchive) {
+                // Send an AJAX request to the PHP script to handle the archiving
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            // Handle the response from the server
+                            if (this.responseText.includes("Response archived successfully")) {
+                                // Use SweetAlert to show a success message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: 'Response archived successfully!',
+                                }).then(function () {
+                                    // Reload the page after the SweetAlert is closed
+                                    location.reload();
+                                });
+                            } else {
+                                // If there's an error, show an alert
+                                alert("Error archiving response: " + this.responseText);
+                            }
+                        } else {
+                            // Handle the case where the request failed
+                            alert("Error archiving response.");
                         }
-                        alert(this.responseText); // Display success message after row removal
-                    } else {
-                        alert("Error archiving response: " + this.responseText);
                     }
-                } else {
-                    // Handle the case where the request failed
-                    alert("Error archiving response.");
-                }
+                };
+                xhttp.open("GET", "archive_response.php?responseId=" + responseId, true);
+                xhttp.send();
             }
-        };
-        xhttp.open("GET", "archive_response.php?responseId=" + responseId, true);
-        xhttp.send();
-    }
-}
+        }
+        function printTable() {
+        // Create a copy of the current table
+        var tableToPrint = document.querySelector('.content table').cloneNode(true);
 
-        function logout() {
-    // Display a confirmation dialog
-    var confirmLogout = window.confirm("Are you sure you want to log out?");
+        // Create a new window for printing
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Print</title></head><body>');
 
-    // If the user clicks OK in the confirmation dialog, proceed with logout
-    if (confirmLogout) {
-        // Redirect to the new page (e.g., logout.php)
-        window.location.href = 'admin.php';
+        // Append the cloned table to the new window
+        printWindow.document.body.appendChild(tableToPrint);
+
+        // Close the HTML document
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+
+        // Focus and print the new window
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
     }
-}
     </script>
 </body>
 </html>

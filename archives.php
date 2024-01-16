@@ -1,72 +1,81 @@
+<?php
+session_start();
+
+// Function to get the current month
+function getCurrentMonth()
+{
+    return date('m');
+}
+
+// Database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "css_system";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch survey responses from the database
+$currentMonth = getCurrentMonth();
+
+// Pagination variables
+$limit = 10; // Number of records per page
+$page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page
+
+$start = ($page - 1) * $limit; // Calculate the starting point for the results on this page
+
+$sql = "SELECT * FROM surveys_archives LIMIT $start, $limit"; // Note: Change this query to fetch data from surveys_archive
+$result = $conn->query($sql);
+
+// Check if the current month is different from the stored month
+if (!isset($_SESSION['currentMonth']) || $_SESSION['currentMonth'] != $currentMonth) {
+    // Reset user IDs and update the stored month
+    $_SESSION['currentMonth'] = $currentMonth;
+
+    // Check if data is being moved to archive.php
+    if (isset($_GET['archiveId'])) {
+        // Reset the auto-increment value of the ID column in surveys_archive
+        $resetIdsSql = "ALTER TABLE surveys_archive AUTO_INCREMENT = 1";
+        $conn->query($resetIdsSql);
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-image: url('images/ustp.jpg');
+            background-image: url('images/ustpalter.png');
             background-repeat: no-repeat;
             background-size: cover;
             color: #333;
         }
 
-        .sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 50px;
-            background-image: url('pics/logo.png');
-            background-position: left top;
-            background-repeat: no-repeat;
-            background-size: 50%;
-            border-right: 1px solid #ddd;
-            background-color: rgba(0, 1, 55, 0.9);
-            font-weight: bolder;
-            transition: width 0.3s;
-        }
-
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar.active {
-            width: 40px;
-        }
-
-        .sidebar a:hover {
-            font-size: 20px;
-            color: #ffc000;
-        }
-
-        .sidebar a.active {
-            color: whitesmoke;
-            font-size: 20px;
-            border-radius: 10px;
-        }
-
-        .sidebar a.active:hover {
-            color: white;
-        }
-
         .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    margin-left: 250px; /* Adjust the margin to match the width of your sidebar */
-}
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin-left: 250px;
+        }
+
         .navbar {
             background-color: #007bff;
             color: white;
@@ -113,30 +122,30 @@
         }
 
         table {
-    margin-top: 10px; /* Adjusted margin */
-    border-collapse: collapse;
-    width: 100%;
-    background-color: #fff;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Added margin-bottom for spacing */
-}
+            margin-top: 10px;
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
 
-th, td {
-    padding: 10px; /* Reduced padding */
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-th {
-    background-color: #007bff;
-    color: white;
-}
+        th {
+            background-color: #007bff;
+            color: white;
+        }
 
-tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-}
+        tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
 
-.delete-button {
+        .delete-button {
             background-color: #28a745;
             color: white;
             border: none;
@@ -148,108 +157,112 @@ tbody tr:hover {
         .delete-button:hover {
             background-color: red;
         }
+
+        .arrow-link {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <a href="adminOffice.php">Manage Responses</a>
-        <a href="feedbacks.php">Collect Feedbacks and Comments</a>
-        <a href="surveyQuestionnaire.php">Manage Questionnaires</a>
-        <a href="archives.php">Archives</a>
-    </div>
 
-    <div class="content">
-        <h2>Survey Responses</h2>
+<div class="content">
+    <h2>Survey Responses</h2>
+    
+    <?php
+    if ($result->num_rows > 0) {
+        echo '<table class="min-w-full bg-white border border-gray-300 shadow-md rounded-md divide-y divide-gray-300">';
+        echo '<thead>';
+        echo '<tr>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">ID</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 1</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 2</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 3</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 4</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 5</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 6</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 7</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 8</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Question 9</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Date Submitted</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">OFFICE</th>';
+        echo '<th class="py-2 px-2 bg-blue-800 text-white border">Action</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
 
-        <?php
-        // Database connection details
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "css_system";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+        // Output data of each row
+        while ($row = $result->fetch_assoc()) {
+            echo '<tr>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["id"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question1"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question2"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question3"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question4"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question5"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question6"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question7"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question8"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["question9"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["created_at"] . '</td>';
+            echo '<td class="py-2 px-2 border ml-2">' . $row["office_type"] . '</td>';
+            echo '<td><button class="delete-button" onclick="deleteResponse(' . $row["id"] . ')">Remove</button></td>';
+            echo '</tr>';
         }
 
-        // Fetch survey responses from the database
-        $sql = "SELECT * FROM surveys_archive";
-        $result = $conn->query($sql);
-
-        // Display the table if there are rows in the result
-        // Display the table if there are rows in the result
-if ($result->num_rows > 0) {
-    echo '<table>';
-    echo '<thead>';
-    echo '<tr>';
-    echo '<th>ID</th>';
-    echo '<th>Question 1</th>';
-    echo '<th>Question 2</th>';
-    echo '<th>Question 3</th>'; // Add this line for question3
-    echo '<th>Question 4</th>'; // Add this line for question4
-    echo '<th>Question 5</th>'; // Add this line for question5
-    echo '<th>Question 6</th>'; // Add this line for question6
-    echo '<th>Question 7</th>'; // Add this line for question7
-    echo '<th>Question 8</th>'; // Add this line for question8
-    echo '<th>Question 9</th>'; // Add this line for question9
-    echo '<th>Feedback</th>';
-    echo '<th>Created At</th>';
-    echo '<th>Office Type</th>';
-    echo '<th>Action</th>';
-    echo '</tr>';
-    echo '</thead>';
-    echo '<tbody>';
-
-    // Output data of each row
-    while ($row = $result->fetch_assoc()) {
-        echo '<tr>';
-        echo '<td>' . $row["id"] . '</td>';
-        echo '<td>' . $row["question1"] . '</td>';
-        echo '<td>' . $row["question2"] . '</td>';
-        echo '<td>' . $row["question3"] . '</td>';
-        echo '<td>' . $row["question4"] . '</td>';
-        echo '<td>' . $row["question5"] . '</td>';
-        echo '<td>' . $row["question6"] . '</td>';
-        echo '<td>' . $row["question7"] . '</td>';
-        echo '<td>' . $row["question8"] . '</td>';
-        echo '<td>' . $row["question9"] . '</td>';
-        // Add more cells for other questions as needed
-        echo '<td>' . $row["feedback"] . '</td>';
-        echo '<td>' . $row["created_at"] . '</td>';
-        echo '<td>' . $row["office_type"] . '</td>';
-        echo '<td><button class="delete-button" onclick="deleteResponse(' . $row["id"] . ')">Remove</button></td>';
-        echo '</tr>';
+        echo '</tbody>';
+        echo '</table>';
+    } else {
+        echo 'No survey responses found.';
     }
+    ?>
 
-    echo '</tbody>';
-    echo '</table>';
-} else {
-    echo 'No survey responses found.';
-}
-
-
-        $conn->close();
-        ?>
-
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </div>
+    <a href="adminDashboard.php" class="arrow-link">
+        &#9664; Back
+    </a>
 
     <script>
+        function deleteResponse(id) {
+            // Display a confirmation dialog
+            var confirmDelete = window.confirm("Are you sure you want to remove this survey response?");
 
-        function logout() {
-    // Display a confirmation dialog
-    var confirmLogout = window.confirm("Are you sure you want to log out?");
-
-    // If the user clicks OK in the confirmation dialog, proceed with logout
-    if (confirmLogout) {
-        // Redirect to the new page (e.g., logout.php)
-        window.location.href = 'admin.php';
-    }
-}
+            // If the user clicks OK in the confirmation dialog, proceed with deletion
+            if (confirmDelete) {
+                // Use AJAX to send a request to the server for deletion
+                $.ajax({
+                    type: "POST",
+                    url: "deleteResponse.php", // Point to the PHP file handling the deletion
+                    data: {id: id}, // Pass the ID of the record to be deleted
+                    success: function (data) {
+                        // Show SweetAlert for success
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Survey response removed successfully!',
+                        }).then(function () {
+                            // Reload the page after successful deletion
+                            location.reload();
+                        });
+                    },
+                    error: function () {
+                        // Show SweetAlert for error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error deleting the survey response.',
+                        });
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

@@ -2,12 +2,13 @@
 <php>
 <head>
     <title>Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-image: url(images/ustp.jpg);
+            background-image: url(images/ustpalter.png);
             background-repeat: no-repeat;
             background-size: cover;
         }
@@ -107,9 +108,20 @@
             background-color: #0056b3;
         }
 
-        .update-button,
+        .update-button {
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        
         .cancel-button {
-            background-color: #007bff;
+            background-color: red;
             color: white;
             border: none;
             border-radius: 5px;
@@ -152,72 +164,116 @@
     <div class="content">
         <button class="logout-button" onclick="logout()">Logout</button>
         <div class="content-form">
-            <h2>Survey Questionnaires</h2>
-            <div class="question-item">
-                <span class="question-label">Question 1:</span>
-                <p class="question-text" id="question1Text">What is your favorite color?</p>
-                <button class="edit-button" onclick="editQuestion(1)">Edit</button>
-                <button class="update-button" onclick="updateQuestion(1)" style="display: none;">Update</button>
-                <button class="cancel-button" onclick="cancelEdit(1)" style="display: none;">Cancel</button>
-            </div>
-            <div class="question-item">
-                <span class="question-label">Question 2:</span>
-                <p class="question-text" id="question2Text">How satisfied are you with our service?</p>
-                <button class="edit-button" onclick="editQuestion(2)">Edit</button>
-                <button class="update-button" onclick="updateQuestion(2)" style="display: none;">Update</button>
-                <button class="cancel-button" onclick="cancelEdit(2)" style="display: none;">Cancel</button>
-            </div>
-            <!-- Add more questions here -->
-        </div>
-    </div>
-    <script>
-function logout() {
-    // Display a confirmation dialog
-    var confirmLogout = window.confirm("Are you sure you want to log out?");
 
-    // If the user clicks OK in the confirmation dialog, proceed with logout
+
+<?php
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "css_system";
+
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch questions from the database
+$sql = "SELECT * FROM survey_questions";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    echo '<h2>Survey Questions</h2>';
+    echo '<div class="question-container">';
+
+    while ($row = $result->fetch_assoc()) {
+        // Add an additional attribute 'data-question-id' to each question
+        echo '<div class="question-item" data-question-id="' . $row['question_id'] . '">';
+        echo '<span class="question-label">Question ' . $row['question_id'] . ':</span>';
+        echo '<p class="question-text" id="question' . $row['question_id'] . 'Text">' . $row['question_text'] . '</p>';
+        echo '<button class="edit-button" onclick="editQuestion(' . $row['question_id'] . ')">Edit</button>';
+        echo '<button class="update-button" onclick="updateQuestion(' . $row['question_id'] . ')" style="display: none;">Update</button>';
+        echo '<button class="cancel-button" onclick="cancelEdit(' . $row['question_id'] . ')" style="display: none;">Cancel</button>';
+        echo '</div>';
+    }
+
+    echo '</div>';
+} else {
+    echo "No questions found";
+}
+
+$conn->close();
+?>
+
+<script>
+function logout() {
+    var confirmLogout = window.confirm("Are you sure you want to log out?");
     if (confirmLogout) {
-        // Redirect to the new page (e.g., logout.php)
         window.location.href = 'admin.php';
     }
 }
 
-        function editQuestion(questionNumber) {
-            const questionText = document.querySelector(`#question${questionNumber}Text`);
-            const editButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .edit-button`);
-            const updateButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .update-button`);
-            const cancelButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .cancel-button`);
-            
-            questionText.contentEditable = true;
-            questionText.focus();
-            editButton.style.display = 'none';
-            updateButton.style.display = 'inline-block';
-            cancelButton.style.display = 'inline-block';
-        }
+function editQuestion(questionNumber) {
+    const questionItem = document.querySelector(`.question-item[data-question-id="${questionNumber}"]`);
+    const questionText = questionItem.querySelector('.question-text');
+    const editButton = questionItem.querySelector('.edit-button');
+    const updateButton = questionItem.querySelector('.update-button');
+    const cancelButton = questionItem.querySelector('.cancel-button');
 
-        function updateQuestion(questionNumber) {
-            const questionText = document.querySelector(`#question${questionNumber}Text`);
-            const editButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .edit-button`);
-            const updateButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .update-button`);
-            const cancelButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .cancel-button`);
-            
-            questionText.contentEditable = false;
-            editButton.style.display = 'inline-block';
-            updateButton.style.display = 'none';
-            cancelButton.style.display = 'none';
-        }
+    questionText.contentEditable = true;
+    questionText.focus();
+    questionItem.classList.add('editing');
+    editButton.style.display = 'none';
+    updateButton.style.display = 'inline-block';
+    cancelButton.style.display = 'inline-block';
+}
 
-        function cancelEdit(questionNumber) {
-            const questionText = document.querySelector(`#question${questionNumber}Text`);
-            const editButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .edit-button`);
-            const updateButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .update-button`);
-            const cancelButton = document.querySelector(`.question-item:nth-child(${questionNumber}) .cancel-button`);
-            
-            questionText.contentEditable = false;
-            editButton.style.display = 'inline-block';
-            updateButton.style.display = 'none';
-            cancelButton.style.display = 'none';
+function updateQuestion(questionNumber) {
+    const questionItem = document.querySelector(`.question-item[data-question-id="${questionNumber}"]`);
+    const questionText = questionItem.querySelector('.question-text');
+    const editButton = questionItem.querySelector('.edit-button');
+    const updateButton = questionItem.querySelector('.update-button');
+    const cancelButton = questionItem.querySelector('.cancel-button');
+
+    questionText.innerHTML = questionText.innerText;
+    questionItem.classList.remove('editing');
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'update_question.php', true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            console.log(xhr.responseText);
         }
-    </script>
+    };
+
+    const params = `question_id=${questionNumber}&question_text=${encodeURIComponent(questionText.innerText)}`;
+    xhr.send(params);
+
+    editButton.style.display = 'inline-block';
+    updateButton.style.display = 'none';
+    cancelButton.style.display = 'none';
+}
+
+function cancelEdit(questionNumber) {
+    const questionItem = document.querySelector(`.question-item[data-question-id="${questionNumber}"]`);
+    const questionText = questionItem.querySelector('.question-text');
+    const editButton = questionItem.querySelector('.edit-button');
+    const updateButton = questionItem.querySelector('.update-button');
+    const cancelButton = questionItem.querySelector('.cancel-button');
+
+    questionText.innerText = questionText.innerHTML;
+    questionItem.classList.remove('editing');
+
+    editButton.style.display = 'inline-block';
+    updateButton.style.display = 'none';
+    cancelButton.style.display = 'none';
+}
+</script>
+</div>
+</div>
 </body>
-</php>
+</html>

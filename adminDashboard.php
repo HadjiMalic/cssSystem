@@ -2,12 +2,13 @@
 <php>
 <head>
     <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-image: url(images/ustp.jpg);
+            background-image: url(images/ustpalter.png);
             background-repeat: no-repeat;
             background-size: cover;
         }
@@ -102,46 +103,98 @@
         .logout-button:hover {
             background-color: #cc0000;
         }
+        .bg-cover {
+            background-size: cover;
+        }
+
+        .text-blue-800 {
+            color: #1a365d;
+        }
+
+       
+        .hover\:bg-blue-700:hover {
+            background-color: #0056b3;
+        }
+
+        .border-blue-800 {
+            border-color: #1a365d;
+        }
+
+        .text-white {
+            color: #fff;
+        }
+
+        .bg-red-700 {
+            background-color: #ff0000;
+        }
+
+        .hover\:bg-red-800:hover {
+            background-color: #cc0000;
+        }
+
+        .w-40 {
+            width: 10rem;
+        }
     </style>
 </head>
-<body>
-    <div class="sidebar">
-        
-        <a href="adminOffice.php">Manage Responses</a>
-        <a href="feedbacks.php">Collect Feedbacks and Comments</a>
-        <a href="surveyQuestionnaire.php">Manage Questionnaires</a>
-        <a href="archives.php">Archives</a>
+<body class="bg-cover">
+    <div class="sidebar bg-blue-500 text-white">
+        <a href="adminOffice.php" class="py-3">Manage Responses</a>
+        <a href="feedbacks.php" class="py-3">Collect Feedbacks and Comments</a>
+        <a href="surveyQuestionnaire.php" class="py-3">Manage Questionnaires</a>
+        <a href="archives.php" class="py-3">Archives</a>
     </div>
-<div class="content">
-    
-    <div class="box">
-        <h1>This content box will display several data such as numbers of offices and Questionnaires</h1>
-        
+    <div class="content ml-64 p-4">
+        <!-- Display counter for survey responses -->
+        <div class="counter-box bg-white bg-opacity-50 border-2 border-blue-800 rounded p-4">
+            <h2 class="text-blue-800">Users Response:</h2>
+            <?php
+            // Database connection details
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "css_system";
+
+            // Create connection
+            $conn = new mysqli($servername, $username, $password, $dbname);
+
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            // Fetch count of users who responded
+            $sqlCount = "SELECT COUNT(DISTINCT id) AS userCount FROM survey_responses";
+            $resultCount = $conn->query($sqlCount);
+            
+            if ($resultCount && $resultCount->num_rows > 0) {
+                $row = $resultCount->fetch_assoc();
+                echo '<h1 class="text-3xl font-bold">' . $row['userCount'] . '</h1>';
+            } else {
+                echo '<p>No responses found.</p>';
+            }
+
+            $conn->close();
+            ?>
+        </div>
+
+        <button class="logout-button bg-red-700 text-white hover:bg-red-800 px-4 py-2 rounded mt-4" onclick="confirmLogout()">Logout</button>
+
+        <script>
+            function confirmLogout() {
+                var confirmLogout = confirm("Are you sure you want to log out?");
+                if (confirmLogout) {
+                    logout();
+                } else {
+                    // If the user clicks "Cancel," do nothing
+                    // You can add additional actions here if needed
+                }
+            }
+
+            function logout() {
+                window.location.href = 'admin.php';
+            }
+        </script>
     </div>
-    <div class="box">
-        <h2>"This will display some recent feedbacks"</h2>
-    </div>
-</div>
-<button class="logout-button" onclick="confirmLogout()">Logout</button>
-
-<script>
-    function confirmLogout() {
-        // Display a confirmation dialog
-        var confirmLogout = confirm("Are you sure you want to log out?");
-
-        // If the user clicks "OK," proceed with the logout
-        if (confirmLogout) {
-            logout();
-        } else {
-            // If the user clicks "Cancel," do nothing
-            // You can add additional actions here if needed
-        }
-    }
-
-    function logout() {
-        // Redirect to the new page (e.g., logout.php)
-        window.location.href = 'admin.php';
-    }
-</script>
 </body>
 </php>

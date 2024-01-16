@@ -4,214 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
     <title>Survey Form</title>
-    <style>
+       <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f7f7f7;
             margin: 0;
             padding: 0;
             text-align: center;
-            background-image: url('images/ustp.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
+            background-image: url('images/ustpalter.png');
+           background-size: cover; 
         }
-
         h1 {
             font-size: 32px;
             color: #333;
             margin: 20px 0;
         }
-
         .user-type-card {
             width: 80%;
             margin: 20px auto;
             display: flex;
             justify-content: space-around;
         }
-
         .user-type-option {
             margin: 10px;
         }
-
-        .app-table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .app-table th,
-        .app-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .app-table th {
-            background-color: #3498db;
-            color: white;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-
-        .app-table td input[type="radio"] {
-            display: none;
-        }
-
-        .app-table td .radio-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .app-table td label {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-
-            /* Add these styles for the background colors */
-            .app-table th:nth-child(2) { background-color: #45a049; color: white; } /* Strongly Agree */
-        .app-table th:nth-child(3) { background-color: #4CAF50; color: white; } /* Agree */
-        .app-table th:nth-child(4) { background-color: #f0ad4e; color: white; } /* Neutral */
-        .app-table th:nth-child(5) { background-color: #d9534f; color: white; } /* Disagree */
-        .app-table th:nth-child(6) { background-color: #c9302c; color: white; } /* Strongly Disagree */
-        .app-table th:nth-child(7) { background-color: gray; color: white; } /* Not Applicable */
-
-
-        .app-table td input[type="radio"]:checked+label {
-            background-color: #2577b5;
-        }
-
-        .app-table td input[type="radio"][value="5"]:checked+label {
-            background-color: #45a049;
-        }
-
-        .app-table td input[type="radio"][value="4"]:checked+label {
-            background-color: #4CAF50;
-        }
-
-        .app-table td input[type="radio"][value="3"]:checked+label {
-            background-color: #f0ad4e;
-        }
-
-        .app-table td input[type="radio"][value="2"]:checked+label {
-            background-color: #d9534f;
-        }
-
-        .app-table td input[type="radio"][value="1"]:checked+label {
-            background-color: #c9302c;
-        }
-
-        .app-table td input[type="radio"][value="NA"]:checked+label {
-            background-color: gray;
-        }
-
-        .app-table td .number {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #333;
-            font-weight: bold;
-        }
-
-        .submitButton
-         {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 10px;
-            transition: background-color 0.3s;
-        }
-
-        .back-button {
-            background-color: red;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 10px;
-            transition: background-color 0.3s;
-            
-        }
-
         .submitButton:hover
          {
             background-color: green;
         }
-        
-        .back-button:hover{
-
-            background-color: cr;
-        }
-
-        .feedback-box {
+        .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 600px; /* Adjust as needed */
-    margin: 20px auto;
-    text-align: left;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.modal-content {
+    background-color: #fff;
     padding: 20px;
     border-radius: 10px;
-    background-color: aqua;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s ease-in-out;
 }
-
-
-.feedback-box label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  
+/* Add these styles for the backdrop overlay */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    transition: opacity 0.3s, visibility 0.3s;
 }
-
-.feedback-box textarea {
-    width: 98%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    resize: vertical;
+/* Add styles for the "Continue" button */
+.continue-button,
+.cancel-button {
+    transition: background-color 0.3s, transform 0.3s;
 }
+.modal-open .modal {
+    pointer-events: none;
+}
+.modal-open .modal-content {
+    pointer-events: auto;
+}
+/* Add these styles for the backdrop overlay */
+.blur {
+            filter: blur(4px);
+            pointer-events: none; /* Disable interactions on the blurred survey */
+            transition: filter 0.3s, pointer-events 0.3s;
 
-.modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
         }
-
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: auto;
-            text-align: center;
-            padding: 20px;
+        /* Add these styles for the backdrop overlay */
+        .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+        body.modal-open {
+            overflow: hidden;
         }
-
         .close {
             position: absolute;
             top: 10px;
@@ -231,9 +121,20 @@
             margin-top: 10px;
             transition: background-color 0.3s;
         }
-
         .continue-button:hover {
             background-color: #2980b9;
+        }
+        .cancel-button {
+            background-color: #3498db;
+            color: red;
+            font-weight: 900;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
         }
 
         /* Style for all dropdown menus on the page */
@@ -267,448 +168,225 @@
 .select option:checked {
     color: #2980b9;
 }
+
+.survey-container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow-y: auto; /* Enable scrolling for the survey form if needed */
+    max-height: calc(100vh - 40px); /* Adjust the max height based on your needs */
+}
+
+/* Add a new class for the blurred effect */
+.survey-container.blur {
+    filter: blur(4px);
+    pointer-events: none; /* Disable interactions on the blurred survey */
+}
+
+/* Add a class to apply the blurred effect to the survey */
+.blur .survey-container {
+    filter: blur(4px);
+    pointer-events: none; /* Disable interactions on the blurred survey */
+}
+.radio-container {
+        @apply relative cursor-pointer;
+        @apply user-select-none;
+    }
+
+    .radio-container input {
+        @apply absolute opacity-0 cursor-pointer;
+    }
+
+    .custom-radio {
+        @apply absolute top-0 left-0 h-8 w-8 bg-white border-2 border-blue-500 rounded-full;
+    }
+
+    .number {
+        @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold;
+    }
+
+    .radio-container input:checked + .custom-radio {
+        @apply bg-blue-500;
+        @apply border-blue-500;
+    }
 </style>
-
-
 </head>
 
-<body>
-    <h1>Survey Form</h1>
-   
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Instructions and Guidelines</h2>
-            <p>This Client Satisfaction Survey Measurement (CSM) tracks the customer experience of the government offices. Your feedback on your <u>recently concluded transaction</u> will help this office provide a better service. Personal information shared will be kept confidential.</p>
-            <p>INSTRUCTIONS: Please answer all of the 9 questions provided by the survey by rating from the highest number to the lowest. Please be guided accordingly.</p>
-            <button class="continue-button" onclick="closeModal()">Continue</button>
-        </div>
+<body class="bg-gray-100">
+<div id="myModal" class="modal">
+<div class="modal-content bg-white p-8 rounded-lg shadow-lg max-w-screen-md mx-auto">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h1 class="text-3xl font-bold mb-6 text-blue-800">Instructions & Guidelines</h1>
+<p class="text-lg text-gray-700 mb-4">
+    This Client Satisfaction Survey Measurement (CSM) tracks the customer experience of the government offices. Your feedback on your <u class="text-blue-600">recently concluded transaction</u> will help this office provide a better service. Personal information shared will be kept confidential.
+</p>
+<p class="text-base text-gray-700 mb-2">
+    <span class="font-semibold">INSTRUCTIONS:</span>
+    <ol class="list-decimal pl-4 mt-2">
+        <li>Select first an office that you want before taking the survey.</li>
+        <li>Please answer all the nine questions in the given form.</li>
+        <li>You can freely leave any comments or violent reactions about your latest transaction in the feedback box below. It's an optional.</li>
+    </ol>
+</p>
+<p class="text-base italic text-gray-700">
+    Please take note that the system will not submit the form if there's any question that is left unanswered.
+</p>
+
+
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300" onclick="closeModal()">Continue</button>
+
+<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300" onclick="cancelSurvey()">Cancel</button>
     </div>
-
+</div>
+<!-- Your survey content goes here -->
+    <h1 class="text-2xl font-bold mb-6">Survey Form</h1>
 <!-- Add this code where you want the dropdown menu to appear in your form -->
-<label for="office_type">Select Office:</label>
-<select id="office_type" name="office_type" class="select">
-<option value="" disabled selected>Select Office</option>
-
- <option value="Guidance">Guidance</option>
-    <option value="ICT">ICT</option>
-    <option value="Accreditation">Accreditation</option>
-    <option value="Admin">Admin</option>
-    <option value="Registrar">Registrar</option>
-</select>
-
-
-    <form action="process_form.php" method="post" onsubmit="return validateForm()">
-    
+<label for="office_type" class="block text-gray-700 mb-2" ></label>
+<div class="relative">
+    <select id="office_type" name="office_type" class="select w-full border-2 border-gray-300 rounded-md p-2 focus:outline-none focus:border-blue-500">
+        <option value="" disabled selected>Choose an Office HERE!!!</option>
+        <option value="Guidance">Guidance</option>
+        <option value="ICT">ICT</option>
+        <option value="Accreditation">Accreditation</option>
+        <option value="Admin">Admin</option>
+        <option value="Registrar">Registrar</option>
+    </select>
+    <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+        <!-- You can add an icon or other elements here if needed -->
+    </div>
+</div>
+<form action="process_form.php" method="post" onsubmit="return validateForm()">
         <!-- The rest of your form remains unchanged -->
-
-        <table class="app-table">
+   <div class="container mx-auto mt-8 bg-blue-100 p-8 rounded-lg shadow-lg max-w-screen-lg">
+    <h1 class="text-2xl font-bold mb-6">Service Quality Survey</h1>
+    <div class="overflow-x-auto mt-8 mb-0 rounded-lg">
+    <table class="w-full table-auto bg-white border border-gray-300 shadow-md rounded-md divide-y divide-gray-300">
+    <thead>
             <tr>
-                <th>Service Quality Dimensions</th>
-                <th>Strongly Agree</th>
-                <th>Agree</th>
-                <th>Neutral</th>
-                <th>Disagree</th>
-                <th>Strongly Disagree</th>
-                <th>Not Applicable</th>
-            </tr>
-            <tr>
-                <td>1. I am satisfied with the services that I availed.</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_1" name="question1" value="5">
-                        <label for="q1_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_2" name="question1" value="4">
-                        <label for="q1_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_3" name="question1" value="3">
-                        <label for="q1_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_4" name="question1" value="2">
-                        <label for="q1_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_5" name="question1" value="1">
-                        <label for="q1_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q1_na" name="question1" value="NA">
-                        <label for="q1_na" class="number">NA</label>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-            <tr>
-                <td>2. I spent a reasonable time amount of my transaction.</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q2_1" name="question2" value="5">
-                        <label for="q2_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q2_2" name="question2" value="4">
-                        <label for="q2_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q2_3" name="question2" value="3">
-                        <label for="q2_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q2_4" name="question2" value="2">
-                        <label for="q2_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q2_5" name="question2" value="1">
-                        <label for="q2_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q2_na" name="question2" value="NA">
-                        <label for="q2_na" class="number">NA</label>
-                    </div>
+                    <th class="p-3 bg-blue-800 text-white border">Service Quality Dimensions</th>
+                    <th class="p-3 bg-green-700 text-white border">Strongly Agree</th>
+                    <th class="p-3 bg-green-500 text-white border">Agree</th>
+                    <th class="p-3 bg-yellow-500 text-white border">Neutral</th>
+                    <th class="p-3 bg-red-500 text-white border">Disagree</th>
+                    <th class="p-3 bg-red-700 text-white border">Strongly Disagree</th>
+                    <th class="p-3 bg-gray-500 text-white border">Not Applicable</th>
+                </tr>
+            </thead>
+<tr>
+<?php
 
-                </td>
-            </tr>
-            <tr>
-                <td>3. The office followed the transaction's requirements and steps based on the information provided.</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q3_1" name="question3" value="5">
-                        <label for="q3_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q3_2" name="question3" value="4">
-                        <label for="q3_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q3_3" name="question3" value="3">
-                        <label for="q3_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q3_4" name="question3" value="2">
-                        <label for="q3_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q3_5" name="question3" value="1">
-                        <label for="q3_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q3_na" name="question3" value="NA">
-                        <label for="q3_na" class="number">NA</label>
-                    </div>
+// Assuming you have a database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "css_system";
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+// Fetch questions from the database
+$sql = "SELECT * FROM survey_questions";
+$result = $conn->query($sql);
 
-                </td>
-            </tr>
-                
-            </tr>
-            <tr>
-                <td>4. The steps (including paymen)t I needed to do for my transaction were easy and simple</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q4_1" name="question4" value="5">
-                        <label for="q4_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q4_2" name="question4" value="4">
-                        <label for="q4_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q4_3" name="question4" value="3">
-                        <label for="q4_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q4_4" name="question4" value="2">
-                        <label for="q4_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q4_5" name="question4" value="1">
-                        <label for="q4_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q4_na" name="question4" value="NA">
-                        <label for="q4_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            <tr>
-                <td>5. I easily found information about my transaction from the office or it's website</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q5_1" name="question5" value="5">
-                        <label for="q5_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q5_2" name="question5" value="4">
-                        <label for="q5_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q5_3" name="question5" value="3">
-                        <label for="q5_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q5_4" name="question5" value="2">
-                        <label for="q5_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q5_5" name="question5" value="1">
-                        <label for="q5_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q5_na" name="question5" value="NA">
-                        <label for="q5_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            <tr>
-                <td>6. I paid a reasonable amount of fees for my transaction.</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q6_1" name="question6" value="5">
-                        <label for="q6_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q6_2" name="question6" value="4">
-                        <label for="q6_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q6_3" name="question6" value="3">
-                        <label for="q6_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q6_4" name="question6" value="2">
-                        <label for="q6_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q6_5" name="question6" value="1">
-                        <label for="q6_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q6_na" name="question6" value="NA">
-                        <label for="q6_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            <tr>
-                <td>7. I feel the office was fair to everyone or "walang palakasan", during my transaction</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q7_1" name="question7" value="5">
-                        <label for="q7_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q7_2" name="question7" value="4">
-                        <label for="q7_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q7_3" name="question7" value="3">
-                        <label for="q7_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q7_4" name="question7" value="2">
-                        <label for="q7_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q7_5" name="question7" value="1">
-                        <label for="q7_5" class="number">1</label>
-                    </div>
-
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q7_na" name="question7" value="NA">
-                        <label for="q7_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            <td>8. I was treated courteously by the staff and (if asked for help) the staff was helpful</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q8_1" name="question8" value="5">
-                        <label for="q8_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q8_2" name="question8" value="4">
-                        <label for="q8_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q8_3" name="question8" value="3">
-                        <label for="q8_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q8_4" name="question8" value="2">
-                        <label for="q8_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q8_5" name="question8" value="1">
-                        <label for="q8_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q8_na" name="question8" value="NA">
-                        <label for="q8_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            <td>9. I got what I needed from the government office, or (if got denied) denial of the request was successfully explained it to me</td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q9_1" name="question9" value="5">
-                        <label for="q9_1" class="number">5</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q9_2" name="question9" value="4">
-                        <label for="q9_2" class="number">4</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q9_3" name="question9" value="3">
-                        <label for="q9_3" class="number">3</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q9_4" name="question9" value="2">
-                        <label for="q9_4" class="number">2</label>
-                    </div>
-                </td>
-                <td>
-                    <div class="radio-container">
-                        <input type="radio" id="q9_5" name="question9" value="1">
-                        <label for="q9_5" class="number">1</label>
-                    </div>
-                </td>
-                <td>
-                <div class="radio-container">
-                        <input type="radio" id="q9_na" name="question9" value="NA">
-                        <label for="q9_na" class="number">NA</label>
-                    </div>
-
-                </td>
-            </tr>
-            </tr>
-            
-        </table>
-        <div class="feedback-box">
-            <label for="feedback">Do you have any additional comments or feedback?</label>
-            <textarea id="feedback" name="feedback" rows="4" placeholder="Type your feedback here..." ></textarea>
-        </div>
-        <button class="submitButton" type="submit">Submit</button>
-        </form>
-        <button class="back-button" onclick="goBack()">Back</button>
-
-        <script>
-    // JavaScript function to go back
-    function goBack() {
-        window.location.href = 'index.php'; // Change 'index.php' to the actual URL you want to redirect to
+// Check if there are questions
+if ($result->num_rows > 0) {
+    // Output the questions in a form
+    echo '<form action="submit_survey.php" method="post">';
+    while ($row = $result->fetch_assoc()) {
+        echo '<tr>';
+        echo '<td class="p-4 border">' . $row['question_text'] . '</td>';
+        // Output radio options
+        for ($i = 5; $i >= 1; $i--) {
+            echo '<td class="p-4 border">';
+            echo '<div class="radio-container">';
+            echo '<input type="radio" id="q' . $row['question_id'] . '_' . $i . '" name="question' . $row['question_id'] . '" value="' . $i . '">';
+            echo '<div class="custom-radio"></div>';
+            echo '<label for="q' . $row['question_id'] . '_' . $i . '" class="number">' . $i . '</label>';
+            echo '</div>';
+            echo '</td>';
+        }
+        // Additional option for "NA"
+        echo '<td class="p-4 border">';
+        echo '<div class="radio-container">';
+        echo '<input type="radio" id="q' . $row['question_id'] . '_na" name="question' . $row['question_id'] . '" value="NA">';
+        echo '<div class="custom-radio"></div>';
+        echo '<label for="q' . $row['question_id'] . '_na" class="number">NA</label>';
+        echo '</div>';
+        echo '</td>';
+        echo '</tr>';
     }
+    echo '</form>';
+} else {
+    echo "No questions found";
+}
 
+// Close the database connection
+$conn->close();
+?>
+</table>     
+<div class="p-6 bg-gradient-to-r from-purple-400 via-pink-200 to-blue-400 rounded-lg shadow-md">
+<label for="feedback" class="block text-lg font-semibold text-gray-800 mb-2">Feedback</label>
+<textarea id="feedback" name="feedback" rows="4" class="mt-1 p-2 w-full border-2 border-purple-300 rounded-md focus:outline-none focus:border-purple-500 bg-white text-gray-700" placeholder="Do you have any comments or violent reactions regarding your transaction? Feel free to write."></textarea>
+</div>
+<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300" type="submit">Submit</button>
+</form>
+<script>
+// Declare the modal variable globally
+    const modal = document.getElementById('myModal');
     // Close the modal
     function closeModal() {
-        const modal = document.getElementById('myModal');
         modal.style.display = 'none';
-    }
 
-    // Get the modal element
-    const modal = document.getElementById('myModal');
+        // Remove the modal-open class from the body
+        document.body.classList.remove('modal-open');
+    }
 
     // Open the modal when the page loads
     window.onload = function () {
         modal.style.display = 'block';
-        
+
+        // Add the modal-open class to the body
+        document.body.classList.add('modal-open');
     };
+
+    window.onload = function () {
+    openModal();
+};
+
+// Open the modal
+function openModal() {
+            modal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            document.querySelector('.survey-container').classList.add('blur'); // Apply the blurred effect
+        }
+
+        // Close the modal
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            document.querySelector('.survey-container').classList.remove('blur'); // Remove the blurred effect
+        }
+        function cancelSurvey() {
+    // Redirect the user to index.php
+    window.location.href = 'index.php';
+}
+
+
+        // Function to remove the blurred effect when "Continue" is clicked
+        function removeBlur() {
+            document.querySelector('.survey-container').classList.remove('blur');
+        }
+
+        // Add an event listener to close the modal when clicking on the backdrop overlay
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
 
     function validateForm() {
         // Check if any radio button is not selected for each question
@@ -733,7 +411,7 @@
 
         // Check if the office type is selected
         if (!officeType) {
-            alert("Please select the office type.");
+            alert("Please select the designated office type.");
             return false; // Prevent form submission
         }
 
@@ -759,9 +437,10 @@
         if (!isConfirmed) {
             return false; // Prevent form submission
         }
+        if (isConfirmed){
+            alert("Form submitted successfully");
+        }
 
-        // Display success message (optional)
-        alert("Survey submitted successfully!");
 
         // Continue with form submission
 
@@ -780,6 +459,8 @@
         .catch(error => {
             console.error('Error:', error);
         });
+
+        
 
         return true;
     }

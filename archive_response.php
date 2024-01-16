@@ -1,7 +1,6 @@
 <?php
-// archive_response.php
+session_start();
 
-// Database connection details
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -15,32 +14,45 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the response ID from the AJAX request
-$responseId = $_GET['responseId'];
+// Check if responseId is provided
+if (isset($_GET['responseId'])) {
+    $responseId = $_GET['responseId'];
 
-// Fetch the response data from the survey_responses table
-$sql = "SELECT * FROM survey_responses WHERE id = $responseId";
-$result = $conn->query($sql);
+    // Fetch the response from survey_responses
+    $sqlSelectResponse = "SELECT * FROM survey_responses WHERE id = $responseId";
+    $resultSelectResponse = $conn->query($sqlSelectResponse);
 
-if ($result->num_rows > 0) {
-    // Insert the response data into the surveys_archive table
-    $row = $result->fetch_assoc();
-    $insertSql = "INSERT INTO surveys_archive (id, question1, question2, question3, question4, question5, question6, question7, question8, question9, feedback, created_at, office_type) 
-                  VALUES ('$row[id]', '$row[question1]', '$row[question2]', '$row[question3]', '$row[question4]', '$row[question5]', '$row[question6]', '$row[question7]', '$row[question8]', '$row[question9]', '$row[feedback]', '$row[created_at]', '$row[office_type]')";
-    
-    if ($conn->query($insertSql) === TRUE) {
-        // Delete the response from the survey_responses table
-        $deleteSql = "DELETE FROM survey_responses WHERE id = $responseId";
-        if ($conn->query($deleteSql) === TRUE) {
-            echo "Response archived successfully";
+    if ($resultSelectResponse->num_rows > 0) {
+        // Get the response data
+        $responseData = $resultSelectResponse->fetch_assoc();
+
+        // Log the response data
+        error_log(print_r($responseData, true));
+
+        // Insert the response into surveys_archive
+        $sqlInsertArchive = "INSERT INTO surveys_archives (question1, question2, question3, question4, question5, question6, question7, question8, question9, created_at, office_type)
+                             VALUES ('{$responseData['question1']}', '{$responseData['question2']}', '{$responseData['question3']}', '{$responseData['question4']}', '{$responseData['question5']}',
+                                     '{$responseData['question6']}', '{$responseData['question7']}', '{$responseData['question8']}', '{$responseData['question9']}', '{$responseData['created_at']}', '{$responseData['office_type']}')";
+
+        // Log the SQL query
+        error_log($sqlInsertArchive);
+
+        if ($conn->query($sqlInsertArchive) === TRUE) {
+            // If insertion into surveys_archive is successful, delete the response from survey_responses
+            $sqlDeleteResponse = "DELETE FROM survey_responses WHERE id = $responseId";
+            if ($conn->query($sqlDeleteResponse) === TRUE) {
+                echo "Response archived successfully";
+            } else {
+                echo "Error deleting response: " . $conn->error;
+            }
         } else {
-            echo "Error deleting response: " . $conn->error;
+            echo "Error archiving response: " . $conn->error;
         }
     } else {
-        echo "Error archiving response: " . $conn->error;
+        echo "Response not found";
     }
 } else {
-    echo "Response not found.";
+    echo "Invalid parameters";
 }
 
 $conn->close();
