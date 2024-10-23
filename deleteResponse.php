@@ -1,10 +1,9 @@
 <?php
 // Database connection details
 $servername = "localhost";
-$username = "root";
-$password = "";
+$dbusername = "username";
+$dbpassword = "password";
 $dbname = "css_system";
-
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 

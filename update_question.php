@@ -1,9 +1,8 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "css_system";
-
+            $servername = "localhost";
+            $dbusername = "username";
+            $dbpassword = "password";
+            $dbname = "css_system";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

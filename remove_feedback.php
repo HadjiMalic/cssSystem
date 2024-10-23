@@ -3,8 +3,8 @@
 if (isset($_GET['feedbackId'])) {
     // Your database connection code (replace with your actual details)
     $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $dbusername = "username";
+    $dbpassword = "password";
     $dbname = "css_system";
 
     $conn = new mysqli($servername, $username, $password, $dbname);

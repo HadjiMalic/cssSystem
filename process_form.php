@@ -18,8 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Insert the survey responses into your table, including the office type and questions
     $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $dbusername = "username";
+    $dbpassword = "password";
     $dbname = "css_system";
 
     // Create a connection

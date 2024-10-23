@@ -86,12 +86,12 @@
 
             // Replace these with your actual database credentials
             $servername = "localhost";
-            $dbusername = "root";
-            $dbpassword = "";
+            $dbusername = "username";
+            $dbpassword = "password";
             $dbname = "css_system";
 
             // Create connection
-            $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+            $conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
             // Check connection
             if ($conn->connect_error) {

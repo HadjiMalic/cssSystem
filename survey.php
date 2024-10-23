@@ -280,8 +280,8 @@
 
 // Assuming you have a database connection
 $servername = "localhost";
-$username = "root";
-$password = "";
+$dbusername = "username";
+$dbpassword = "password";
 $dbname = "css_system";
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
